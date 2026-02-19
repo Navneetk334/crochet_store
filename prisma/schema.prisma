@@ -74,6 +74,7 @@ model Product {
   images      String[]
   care        String?
   sizeChart   String?  @db.Text
+  isFeatured Boolean @default(false)
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]
