@@ -9,7 +9,13 @@ declare module "next-auth" {
     }
 
     interface User {
-        role: string;
+        role?: string;
+    }
+}
+
+declare module "@auth/core/adapters" {
+    interface AdapterUser {
+        role?: string;
     }
 }
 

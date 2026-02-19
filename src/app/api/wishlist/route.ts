@@ -66,7 +66,7 @@ export async function GET(req: Request) {
         });
 
         return NextResponse.json({
-            items: wishlist?.items.map(i => i.productId) || []
+            items: wishlist?.items.map((i: any) => i.productId) || []
         });
     } catch (error) {
         return new NextResponse("Internal Error", { status: 500 });
