@@ -8,7 +8,10 @@ import { getProducts } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const products = await getProducts({ take: 4 });
+  const products = await getProducts({
+    isFeatured: true,
+    take: 4,
+  });
 
   return (
     <main className="bg-paper flex flex-col">
