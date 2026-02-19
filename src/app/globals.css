@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+}
+
+@theme {
+  --font-serif: "var(--font-serif)", serif;
+  --font-sans: "var(--font-sans)", sans-serif;
+  --font-script: "var(--font-script)", cursive;
+
+  /* Magic Needles Palette */
+  --color-ivory: #FDFCF8;
+  --color-sage: #8A9A5B;
+  /* Primary Artisan Green */
+  --color-terra: #C07050;
+  /* Warm Clay/Terra-cotta */
+  --color-pebble: #F2F0E9;
+  /* Lighter, warmer grey/beige */
+  --color-charcoal: #333333;
+  /* Softened black for readability */
+  --color-earth-brown: #5C4B40;
+}
+
+:root {
+  --background: var(--color-ivory);
+  --foreground: var(--color-charcoal);
+  --primary: var(--color-sage);
+  --secondary: var(--color-terra);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom Cursor Support */
+@media (pointer: fine) {
+
+  html,
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+}
+
+.font-script {
+  font-family: var(--font-script);
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, var(--color-ivory) 100%);
+}
+
+.btn-primary {
+  @apply bg-sage text-white px-8 py-3 rounded-md transition-all duration-300 hover:bg-sage/90 hover:shadow-lg active:scale-95 text-sm font-bold uppercase tracking-wider;
+}
+
+.btn-secondary {
+  @apply border-2 border-sage text-sage px-8 py-3 rounded-md transition-all duration-300 hover:bg-sage hover:text-white active:scale-95 text-sm font-bold uppercase tracking-wider;
+}
+
+.glass-nav {
+  @apply backdrop-blur-md bg-white/90 border-b border-black/5 shadow-sm;
+}
+
+.artisanal-border {
+  @apply border-2 border-sage/10 rounded-2xl p-4;
+}
+
+/* Admin Layout Utilities */
+body[data-admin-collapsed="true"] .admin-content {
+  margin-left: 80px;
+}
+
+body[data-admin-collapsed="false"] .admin-content,
+body:not([data-admin-collapsed]) .admin-content {
+  margin-left: 280px;
+}
+
+.admin-main-height {
+  min-height: calc(100vh - 5rem);
+}
+
+/* Artisanal Scrollbar Texture */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-pebble);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage);
+  border-radius: 20px;
+  border: 2px solid var(--color-pebble);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7D8F69;
+}
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-sage) var(--color-pebble);
+}
