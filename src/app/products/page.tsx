@@ -1,5 +1,5 @@
 import { getProducts, getCategories } from "@/lib/data";
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 import ProductCard from "@/components/shop/ProductCard";
 import { Search, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import ProductForm from "@/components/admin/ProductForm";
 import { revalidatePath } from "next/cache";

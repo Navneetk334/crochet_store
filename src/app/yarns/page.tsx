@@ -2,7 +2,7 @@ import { getProducts } from "@/lib/data";
 import ProductCard from "@/components/shop/ProductCard";
 import { Search } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 
 export default async function YarnsPage() {
     // Filter for the 'Yarns' category
