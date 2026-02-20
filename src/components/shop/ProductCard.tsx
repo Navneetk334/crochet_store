@@ -1,158 +1,154 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, memo } from "react";
+import Image from "next/image";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/store/useCart";
 
 interface ProductCardProps {
-    product: {
-        id: string;
-        name: string;
-        price: number;
-        discount?: number | null;
-        images: string[];
-        category: { name: string };
-    };
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    discount?: number | null;
+    images: string[];
+    category: { name: string };
+  };
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-    const { addItem } = useCart();
-    const finalPrice = product.discount ? product.price - product.discount : product.price;
+function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCart();
+  const finalPrice = product.discount
+    ? product.price - product.discount
+    : product.price;
 
-    const [isWishlisted, setIsWishlisted] = useState(false);
-    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
-    useEffect(() => {
-        const checkWishlist = async () => {
-            try {
-                const res = await fetch("/api/wishlist");
-                const data = await res.json();
-                if (data.items && data.items.includes(product.id)) {
-                    setIsWishlisted(true);
-                }
-            } catch (error) {
-                console.error("Failed to check wishlist status", error);
-            }
-        };
-        checkWishlist();
-    }, [product.id]);
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    const toggleWishlist = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    if (isWishlistLoading) return;
 
-        if (isWishlistLoading) return;
+    setIsWishlistLoading(true);
+    const previous = isWishlisted;
+    setIsWishlisted(!previous);
 
-        setIsWishlistLoading(true);
-        const previousState = isWishlisted;
-        setIsWishlisted(!previousState);
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
 
-        try {
-            const res = await fetch("/api/wishlist", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId: product.id }),
-            });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setIsWishlisted(data.active);
+    } catch {
+      setIsWishlisted(previous);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
 
-            if (res.status === 401) {
-                // Show a more friendly message or redirect
-                console.warn("Please sign in to save items to your wishlist.");
-                setIsWishlisted(previousState);
-                return;
-            }
-
-            if (!res.ok) throw new Error("Wishlist update failed");
-
-            const data = await res.json();
-            setIsWishlisted(data.active);
-        } catch (error) {
-            console.error(error);
-            setIsWishlisted(previousState);
-        } finally {
-            setIsWishlistLoading(false);
-        }
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            viewport={{ once: true }}
-            className="group bg-paper rounded-[2rem] overflow-hidden shadow-artisan hover:shadow-artisan-hover transition-all duration-700"
+  return (
+    <div className="group bg-paper rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+      {/* Image */}
+      <div className="relative aspect-[4/5] overflow-hidden">
+        <Link
+          href={`/products/${product.id}`}
+          className="block h-full w-full relative"
         >
-            <div className="relative aspect-[4/5] overflow-hidden">
-                <Link href={`/products/${product.id}`} className="block h-full w-full relative z-10" data-cursor="view">
-                    <img
-                        src={product.images[0] || "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=1000"}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
-                </Link>
+          <Image
+            src={
+              product.images[0]
+                ? product.images[0].replace(
+                    "/upload/",
+                    "/upload/f_auto,q_auto,w_600/"
+                  )
+                : "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600"
+            }
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </Link>
 
-                {product.discount && (
-                    <div className="absolute top-6 left-6 bg-charcoal text-paper text-[8px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest z-20 shadow-xl">
-                        Selection
-                    </div>
-                )}
+        {product.discount && (
+          <div className="absolute top-4 left-4 bg-charcoal text-paper text-[8px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+            Selection
+          </div>
+        )}
 
-                <button
-                    onClick={toggleWishlist}
-                    disabled={isWishlistLoading}
-                    className={`absolute top-6 right-6 p-3 bg-paper/90 backdrop-blur-md rounded-full transition-all duration-500 z-30 shadow-md ${isWishlistLoading ? "opacity-50 cursor-not-allowed" : ""} ${isWishlisted ? "text-terra" : "text-charcoal/30 hover:text-terra"}`}
-                >
-                    <Heart size={16} strokeWidth={1.5} className={isWishlisted ? "fill-terra" : ""} />
-                </button>
+        {/* Wishlist */}
+        <button
+          onClick={toggleWishlist}
+          disabled={isWishlistLoading}
+          className={`absolute top-4 right-4 p-2 bg-white rounded-full transition-colors shadow-sm ${
+            isWishlisted ? "text-terra" : "text-charcoal/40 hover:text-terra"
+          }`}
+        >
+          <Heart
+            size={16}
+            strokeWidth={1.5}
+            className={isWishlisted ? "fill-terra" : ""}
+          />
+        </button>
 
-                {/* Interaction Layer - Improved for Perfect Visibility and Hiding */}
-                <div className="absolute inset-x-0 bottom-0 p-6 z-20 translate-y-full group-hover:translate-y-0 transition-all duration-500 ease-out flex justify-center">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            addItem(product);
-                        }}
-                        className="w-full bg-charcoal text-paper py-4 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center justify-center space-x-3 hover:bg-sage transition-all shadow-2xl active:scale-95"
-                    >
-                        <ShoppingBag size={14} className="text-white" />
-                        <span className="text-white whitespace-nowrap">Add to Studio</span>
-                    </button>
-                </div>
+        {/* Add to Cart */}
+        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              addItem(product);
+            }}
+            className="w-full bg-charcoal text-paper py-3 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-sage transition-colors"
+          >
+            <ShoppingBag size={14} />
+            <span>Add to Studio</span>
+          </button>
+        </div>
 
-                {/* Subtle Overlay on Hover */}
-                <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/10 transition-colors duration-500" />
-            </div>
+        <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/10 transition-colors duration-300" />
+      </div>
 
-            <div className="p-8 space-y-4">
-                <div className="flex justify-between items-center">
-                    <span className="text-[9px] uppercase tracking-boutique text-sage font-bold">
-                        {product.category?.name || "Artisan Piece"}
-                    </span>
-                    <div className="flex items-center space-x-1 opacity-40">
-                        <Star size={10} className="text-charcoal fill-charcoal" />
-                        <span className="text-[9px] font-bold text-charcoal">Hand-Finished</span>
-                    </div>
-                </div>
+      {/* Content */}
+      <div className="p-6 space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-[9px] uppercase tracking-widest text-sage font-bold">
+            {product.category?.name || "Artisan Piece"}
+          </span>
 
-                <Link href={`/products/${product.id}`}>
-                    <h3 className="font-serif text-xl text-charcoal hover:text-sage transition-colors line-clamp-2 leading-[1.1] tracking-tight">
-                        {product.name}
-                    </h3>
-                </Link>
+          <div className="flex items-center space-x-1 opacity-40">
+            <Star size={10} className="fill-charcoal" />
+            <span className="text-[9px] font-bold">Hand-Finished</span>
+          </div>
+        </div>
 
-                <div className="flex items-baseline space-x-3 pt-2 border-t border-charcoal/5">
-                    <p className="text-charcoal/80 font-serif text-2xl">
-                        ₹{finalPrice.toLocaleString("en-IN")}
-                    </p>
-                    {product.discount && (
-                        <p className="text-charcoal/20 text-xs line-through font-light">
-                            ₹{product.price.toLocaleString("en-IN")}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </motion.div>
-    );
+        <Link href={`/products/${product.id}`}>
+          <h3 className="font-serif text-lg text-charcoal hover:text-sage transition-colors line-clamp-2">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="flex items-baseline space-x-3 pt-2 border-t border-charcoal/5">
+          <p className="font-serif text-xl">
+            ₹{finalPrice.toLocaleString("en-IN")}
+          </p>
+
+          {product.discount && (
+            <p className="text-charcoal/30 text-xs line-through">
+              ₹{product.price.toLocaleString("en-IN")}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
+
+export default memo(ProductCard);
