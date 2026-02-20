@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const products = await getProducts({
-    isFeatured: true,
     take: 4,
   });
 
