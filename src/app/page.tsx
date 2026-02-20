@@ -12,6 +12,8 @@ export default async function Home() {
     take: 4,
   });
 
+  console.log("PROD PRODUCTS:", products);
+
   return (
     <main className="bg-paper flex flex-col">
       <Hero />
