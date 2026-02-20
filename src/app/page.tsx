@@ -5,7 +5,7 @@ import StorySection from "@/components/shop/StorySection";
 import Testimonials from "@/components/shop/Testimonials";
 import { getProducts } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function Home() {
   const products = await getProducts({

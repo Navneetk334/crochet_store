@@ -1,5 +1,6 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 import {
     Plus,
     Search,
@@ -71,12 +72,22 @@ export default async function AdminCustomersPage() {
                                 </tr>
                             ) : (
                                 customers.map((customer: any) => (
-                                    <tr key={customer.id} className="group hover:bg-pebble/20 transition-colors">
+                                    <tr key={customer.id} className="group hover:bg-pebble/20 transition-colors duration-150">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center space-x-4">
                                                 <div className="w-10 h-10 rounded-xl bg-pebble overflow-hidden flex-shrink-0 border border-pebble">
                                                     {customer.image ? (
-                                                        <img src={customer.image} alt={customer.name || ""} className="w-full h-full object-cover" />
+                                                        <Image
+                                                            src={customer.image.replace(
+                                                            "/upload/",
+                                                            "/upload/f_auto,q_auto,w_200/"
+                                                            )}
+                                                            alt={customer.name || ""}
+                                                            width={40}
+                                                            height={40}
+                                                            className="w-full h-full object-cover"
+                                                            sizes="40px"
+                                                        />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-charcoal/20">
                                                             <User size={20} />

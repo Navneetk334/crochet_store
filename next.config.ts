@@ -1,18 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-    ],
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '10mb',
-    },
+    domains: ["res.cloudinary.com"],
   },
 };
 
