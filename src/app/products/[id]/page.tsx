@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import {
   ChevronRight,
-  Star,
   Truck,
   ShieldCheck,
   RefreshCcw,
@@ -19,8 +18,14 @@ export default async function ProductDetailPage({
 }: {
   params: { id: string };
 }) {
-  const product = await prisma.product.findUnique({
-    where: { id: params.id },
+  // 🔥 FIX: Support BOTH id and slug
+  const product = await prisma.product.findFirst({
+    where: {
+      OR: [
+        { id: params.id },
+        { slug: params.id },
+      ],
+    },
     include: {
       category: { select: { name: true, slug: true } },
     },
@@ -79,7 +84,7 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            {product.images.length > 1 && (
+            {product.images?.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
                 {product.images.map((img: string, i: number) => {
                   const optimizedThumb = img.replace(
@@ -110,7 +115,7 @@ export default async function ProductDetailPage({
           <div className="space-y-10">
             <div className="space-y-4">
               <span className="text-[10px] uppercase tracking-widest text-sage font-bold px-3 py-1 bg-sage/5 rounded-full">
-                {product.category.name}
+                {product.category?.name}
               </span>
 
               <h1 className="text-4xl md:text-5xl font-serif text-charcoal">
