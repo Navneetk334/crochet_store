@@ -16,14 +16,15 @@ export const revalidate = 60;
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   // 🔥 FIX: Support BOTH id and slug
   const product = await prisma.product.findFirst({
     where: {
       OR: [
-        { id: params.id },
-        { slug: params.id },
+        { id: id },
+        { slug: id },
       ],
     },
     include: {
